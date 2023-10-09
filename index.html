@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Sort Visualization</title>
+    <style>
+        body {
+            background-color: rgb(167, 157, 157);
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            margin: 0px;
+        }
+
+        h3 {
+            margin: 10px;
+        }
+
+        h1,
+        h3 {
+            color: rgb(63, 28, 217);
+        }
+
+        .container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .array-grid {
+            display: flex;
+            flex-direction: row;
+            /* Display arrays horizontally */
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .array-grid > div {
+            width: 50px;
+            height: 50px;
+            background-color: #b2ae33;
+            border: 1px solid #101011;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: #0e0d0d;
+            margin-right: 2px;
+            /* Add some spacing between cells */
+        }
+
+        #start-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #27ae60;
+            color: #ffffff9f;
+            border: none;
+            cursor: pointer;
+        }
+
+        #input-array {
+            margin-top: 20px;
+            padding: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1 align="center">Quick Sort</h1>
+    <h3 align="center">Chandan (VU21CSEN0101415)</h3>
+    <div class="container">
+        <label for="input-array">Enter numbers separated by commas:</label>
+        <input type="text" id="input-array" placeholder="e.g., 2, 8, 2, 9, 7, 8, 1, 4, 5">
+        <button id="start-button">Start Quick Sort</button>
+        <div class="array-grid" id="initial-array-grid">
+        </div>
+    </div>
+    <script>
+        // Quick Sort Implementation
+        function quickSort(arr, left = 0, right = arr.length - 1) {
+            if (arr.length <= 1) {
+                return arr;
+            }
+
+            if (left < right) {
+                const pivotIndex = partition(arr, left, right);
+                quickSort(arr, left, pivotIndex - 1);
+                quickSort(arr, pivotIndex + 1, right);
+            }
+
+            return arr;
+        }
+
+        function partition(arr, left, right) {
+            const pivot = arr[right];
+            let i = left - 1;
+
+            for (let j = left; j < right; j++) {
+                if (arr[j] < pivot) {
+                    i++;
+                    swap(arr, i, j);
+                }
+            }
+
+            swap(arr, i + 1, right);
+            return i + 1;
+        }
+
+        function swap(arr, i, j) {
+            const temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+
+        // Visualization
+        const initialArrayGrid = document.getElementById('initial-array-grid');
+        const startButton = document.getElementById('start-button');
+        const inputArray = document.getElementById('input-array');
+
+        startButton.addEventListener('click', () => {
+            startButton.style.display = 'none';
+            const userInput = inputArray.value.trim();
+
+            // Validate and parse user input
+            const userArray = userInput.split(',').map(num => parseInt(num.trim()));
+
+            if (validateInput(userArray)) {
+                // Clear initial array grid
+                initialArrayGrid.innerHTML = '';
+
+                // Display the user input array in grid format
+                userArray.forEach((value) => {
+                    const cell = document.createElement('div');
+                    cell.classList.add('array-grid');
+                    cell.textContent = value;
+                    initialArrayGrid.appendChild(cell);
+                });
+
+                // Start Quick Sort visualization
+                visualizeQuickSort(userArray);
+            } else {
+                alert('Invalid input. Please enter numbers separated by commas.');
+            }
+        });
+
+        function validateInput(arr) {
+            // Check if the input is a non-empty array of numbers
+            return Array.isArray(arr) && arr.length > 0 && arr.every(num => !isNaN(num));
+        }
+
+        function visualizeQuickSort(arr) {
+            const steps = quickSortSteps(arr);
+            let stepIndex = 0;
+
+            function displayStep() {
+                if (stepIndex < steps.length) {
+                    const step = steps[stepIndex];
+
+                    // Create a container for the sorted array
+                    const sortedArrayGrid = createGridFromArray(step);
+
+                    // Display the sorted array at each step
+                    document.body.appendChild(sortedArrayGrid);
+
+                    stepIndex++;
+                    setTimeout(displayStep, 1000); // Adjust the delay between steps as needed
+                }
+            }
+
+            displayStep();
+        }
+
+        function quickSortSteps(arr) {
+            const steps = [];
+
+            function quickSortStep(arr, left, right) {
+                if (left < right) {
+                    const pivotIndex = partition(arr, left, right);
+                    const step = [...arr]; // Clone the array
+                    steps.push(step);
+
+                    quickSortStep(arr, left, pivotIndex - 1);
+                    quickSortStep(arr, pivotIndex + 1, right);
+                }
+            }
+
+            quickSortStep(arr, 0, arr.length - 1);
+            return steps;
+        }
+
+        function createGridFromArray(arr) {
+            const grid = document.createElement('div');
+            grid.classList.add('array-grid');
+
+            arr.forEach((value) => {
+                const cell = document.createElement('div');
+                cell.textContent = value;
+                cell.classList.add('array-grid-cell');
+                grid.appendChild(cell);
+            });
+
+            return grid;
+        }
+    </script>
+</body>
+</html>
